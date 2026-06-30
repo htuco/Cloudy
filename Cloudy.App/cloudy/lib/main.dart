@@ -1,6 +1,5 @@
 import 'package:cloudy/providers/weather_provider.dart';
 import 'package:cloudy/screens/startup_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,8 +7,12 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb) {
+  // Load the bundled .env on every platform (incl. web) so the API key is
+  // available. Guard so a missing/unreadable file never blocks startup.
+  try {
     await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('Failed to load .env: $e');
   }
   runApp(const MyApp());
 }
