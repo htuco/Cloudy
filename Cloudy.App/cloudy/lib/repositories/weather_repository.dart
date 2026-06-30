@@ -10,16 +10,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../core/constants/api_endpoints.dart';
 
-// Fallback ensures the key is always available even if dotenv fails to load
-const _hardcodedKey = 'ecfe9721ce57e7558b9856da605d0795';
-
+// API key is read from the bundled .env asset. On web/CI the value is injected
+// at build time via --dart-define / the .env created by the build pipeline.
 String get apiKey {
-  if (kIsWeb) return '7cdbbf30a16a8bec55dfa9cd201d4dc1';
   try {
-    final fromEnv = dotenv.env['WEATHER_API_KEY'] ?? '';
-    return fromEnv.isNotEmpty ? fromEnv : _hardcodedKey;
+    return dotenv.env['WEATHER_API_KEY'] ?? '';
   } catch (_) {
-    return _hardcodedKey;
+    return '';
   }
 }
 
