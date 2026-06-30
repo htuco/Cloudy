@@ -23,7 +23,7 @@ jobs:
         working-directory: Cloudy.App/cloudy
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -33,6 +33,14 @@ jobs:
 
       - name: Create .env from secret
         run: echo "WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}" > .env
+
+      - name: Strip native-only dependency for web build
+        # liquid_glass_renderer is native-only (macOS/iOS/Android) and bundles
+        # shaders that fail to compile for web. The app already uses a
+        # conditional import so web never references the package — removing it
+        # here keeps its shaders out of the web bundle.
+        run: |
+          sed -i '/^  liquid_glass_renderer:/d' pubspec.yaml
 
       - name: Install dependencies
         run: flutter pub get
